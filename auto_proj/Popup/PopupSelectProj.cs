@@ -85,11 +85,16 @@ namespace auto_proj.Popup
                 string hmiFilePath = row["hmi_file_path"].ToString();
                 byte[] himExcel = row["hmi_excel"].ToString() == "" ? null : (byte[])row["hmi_excel"];
 
+                int aiCh = int.Parse(row["ai_ch"].ToString());
+                int aoCh = int.Parse(row["ao_ch"].ToString());
+                int diCh = int.Parse(row["di_ch"].ToString());
+                int doCh = int.Parse(row["do_ch"].ToString());
+
                 DateTime created = (DateTime)row["created_date"];
 
                 project = new Project(id, projCode, projName, plcBrand, plcCount, sAi, sAo, sDi, 
                     sDo, instFileName, instFilePath, instExcel, templateFileName, templateFilePath, 
-                    templateExcel, ioListFileName, ioListFilePath, ioListExcel, hmiFileName, hmiFilePath, himExcel, created);
+                    templateExcel, ioListFileName, ioListFilePath, ioListExcel, hmiFileName, hmiFilePath, himExcel, created, aiCh, aoCh, diCh, doCh);
 
                 SelectedProjArgs args = new SelectedProjArgs();
                 args.project = project;
@@ -111,7 +116,8 @@ namespace auto_proj.Popup
             {
                 string query = @"SELECT proj_id, proj_code, proj_name, plc_count, plc_brand, ai_name, ao_name, 
                                         di_name, do_name, inst_file_name, inst_file_path, inst_excel, template_file_name, template_file_path, 
-	                                    template_excel, ioList_file_name, ioList_file_path, ioList_excel, hmi_file_name, hmi_file_path, hmi_excel, created_date, updated_date
+	                                    template_excel, ioList_file_name, ioList_file_path, ioList_excel, hmi_file_name, hmi_file_path, hmi_excel, 
+                                        created_date, updated_date, ai_ch, ao_ch, di_ch, do_ch
 	                             FROM proj_master
                                  ORDER BY created_date desc";
                 using(SqlCommand cmd =  new SqlCommand(query, DBConn))

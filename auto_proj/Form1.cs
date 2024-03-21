@@ -31,7 +31,7 @@ namespace auto_proj
         }
         private void barButtonItem2_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
-            
+           
         }
         private void subIOCount_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
@@ -84,6 +84,12 @@ namespace auto_proj
         {
             FormHmi formHmi = null;
             OpenForm(formHmi, typeof(FormHmi));
+        }
+
+        private void subModule_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            FormGetModule module = null;
+            OpenForm(module, typeof(FormGetModule));
         }
     }
 }

@@ -20,6 +20,11 @@ namespace auto_proj.Classes
         string sAo;
         string sDi;
         string sDo;
+        int aiCh;
+        int aoCh;
+        int diCh;
+        int doCh;
+
         string instFileName;
         string instFilePath;
         byte[] instExcel;
@@ -42,7 +47,7 @@ namespace auto_proj.Classes
                         string templateFileName, string templateFilePath, byte[] templateExcel,
                         string ioListFileName, string ioListFilePath, byte[] ioListExcel,
                         string hmiFileName, string hmiFilePath, byte[] hmiExcel,
-                        DateTime created) 
+                        DateTime created, int aiCh, int aoCh, int diCh, int doCh) 
         {
             this.id = id;
             this.projCode = projCode;
@@ -66,6 +71,10 @@ namespace auto_proj.Classes
             this.hmiFilePath = hmiFilePath;
             this.hmiExcel = hmiExcel;
             this.created = created;
+            this.aiCh = aiCh;
+            this.aoCh = aoCh;
+            this.diCh = diCh;
+            this.doCh = doCh;
         }
 
         public int ProjID { get => this.id; }
@@ -84,6 +93,12 @@ namespace auto_proj.Classes
         public string AoDefine { get => this.sAo; set => this.sAo = value; }
         public string DiDefine { get => this.sDi; set => this.sDi = value; }
         public string DoDefine { get => this.sDo; set => this.sDo = value; }
+
+        public int AiChannel { get => this.aiCh; }
+        public int AoChannel { get => this.aoCh; }
+        public int DiChannel { get => this.diCh; }
+        public int DoChannel { get => this.doCh; }
+
         public string InstFileName { get => this.instFileName; }
         public string InstFilePath { get => this.instFilePath; }
         public byte[] InstExcel { get => this.instExcel; }

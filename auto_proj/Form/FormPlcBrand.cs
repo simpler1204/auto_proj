@@ -70,6 +70,8 @@ namespace auto_proj.Form
                 }
             }
 
+            plcList.DataSource = plcNames;
+
             return plcNames.GetEnumerator();
         }      
 

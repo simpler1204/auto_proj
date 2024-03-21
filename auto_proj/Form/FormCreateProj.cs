@@ -110,7 +110,7 @@ namespace auto_proj.Form
             string sCode, sName, sBrand, sCustomer, sHmi, sAi, sAo, sDi, sDo;
             string fileName = string.Empty;
             string fileTotalName = string.Empty;
-            int plcCount;
+            int plcCount, aiCh,aoCh, diCh, doCh;
 
             if (!CheckFields()) return; // 빠진 항목이 있으면 return;
 
@@ -126,13 +126,18 @@ namespace auto_proj.Form
             plcCount = int.Parse(cmbPlcCount.Text.Trim());
             fileName = txtFileName.Text.Trim();
             fileTotalName = txtFilePath.Text.Trim();
+            aiCh = int.Parse(cmbAiCh.Text);
+            aoCh = int.Parse(cmbAoCh.Text);
+            diCh = int.Parse(cmbDiCh.Text);
+            doCh = int.Parse(cmbDoCh.Text);
+
             int rtn = 0;
 
             string connectString = SIDS.Instance.MakeConnectionString("DB");
             using (SqlConnection DBConn = new SqlConnection(connectString))
             {
-                string query = @"INSERT INTO proj_master(proj_code, proj_name, customer, plc_count, plc_brand, hmi, ai_name, ao_name, di_name, do_name, inst_file_name, inst_file_path, inst_excel, created_date)
-                                VALUES(@code, @name, @customer, @Count, @plc, @hmi, @ai, @ao, @di, @do, @file_name, @file_path, @inst_excel, getdate())";
+                string query = @"INSERT INTO proj_master(proj_code, proj_name, customer, plc_count, plc_brand, hmi, ai_name, ao_name, di_name, do_name, inst_file_name, inst_file_path, inst_excel, created_date, ai_ch, ao_ch, di_ch, do_ch)
+                                VALUES(@code, @name, @customer, @Count, @plc, @hmi, @ai, @ao, @di, @do, @file_name, @file_path, @inst_excel, getdate(), @ai_ch, @ao_ch, @di_ch, @do_ch)";
                
                 using(SqlCommand cmd = new SqlCommand(query, DBConn))
                 {                   
@@ -149,6 +154,10 @@ namespace auto_proj.Form
                     cmd.Parameters.Add("@file_name", SqlDbType.NVarChar).Value = fileName;
                     cmd.Parameters.Add("@file_path", SqlDbType.NVarChar).Value = fileTotalName;
                     cmd.Parameters.Add("@inst_excel", SqlDbType.VarBinary).Value = instExcelBytes;
+                    cmd.Parameters.Add("@ai_ch", SqlDbType.Int).Value = aiCh;
+                    cmd.Parameters.Add("@ao_ch", SqlDbType.Int).Value = aoCh;
+                    cmd.Parameters.Add("@di_ch", SqlDbType.Int).Value = diCh;
+                    cmd.Parameters.Add("@do_ch", SqlDbType.Int).Value = doCh;
 
                     try
                     {

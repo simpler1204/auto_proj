@@ -59,12 +59,24 @@ namespace auto_proj.Form
             this.labelControl2 = new DevExpress.XtraEditors.LabelControl();
             this.txtProjName = new System.Windows.Forms.TextBox();
             this.labelControl1 = new DevExpress.XtraEditors.LabelControl();
+            this.labelControl12 = new DevExpress.XtraEditors.LabelControl();
+            this.labelControl13 = new DevExpress.XtraEditors.LabelControl();
+            this.labelControl14 = new DevExpress.XtraEditors.LabelControl();
+            this.labelControl15 = new DevExpress.XtraEditors.LabelControl();
+            this.cmbAiCh = new DevExpress.XtraEditors.ComboBoxEdit();
+            this.cmbAoCh = new DevExpress.XtraEditors.ComboBoxEdit();
+            this.cmbDiCh = new DevExpress.XtraEditors.ComboBoxEdit();
+            this.cmbDoCh = new DevExpress.XtraEditors.ComboBoxEdit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
             this.panelControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cmbHmi.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmbCustomer.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmbPlcBrand.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmbPlcCount.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cmbAiCh.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cmbAoCh.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cmbDiCh.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cmbDoCh.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // buttons
@@ -85,6 +97,14 @@ namespace auto_proj.Form
             // 
             // panelControl1
             // 
+            this.panelControl1.Controls.Add(this.cmbDoCh);
+            this.panelControl1.Controls.Add(this.cmbDiCh);
+            this.panelControl1.Controls.Add(this.cmbAoCh);
+            this.panelControl1.Controls.Add(this.cmbAiCh);
+            this.panelControl1.Controls.Add(this.labelControl15);
+            this.panelControl1.Controls.Add(this.labelControl14);
+            this.panelControl1.Controls.Add(this.labelControl13);
+            this.panelControl1.Controls.Add(this.labelControl12);
             this.panelControl1.Controls.Add(this.cmbHmi);
             this.panelControl1.Controls.Add(this.cmbCustomer);
             this.panelControl1.Controls.Add(this.labelControl11);
@@ -312,6 +332,92 @@ namespace auto_proj.Form
             this.labelControl1.TabIndex = 0;
             this.labelControl1.Text = "프로젝트 이름 : ";
             // 
+            // labelControl12
+            // 
+            this.labelControl12.Location = new System.Drawing.Point(536, 379);
+            this.labelControl12.Name = "labelControl12";
+            this.labelControl12.Size = new System.Drawing.Size(89, 29);
+            this.labelControl12.TabIndex = 25;
+            this.labelControl12.Text = "AI채널 : ";
+            // 
+            // labelControl13
+            // 
+            this.labelControl13.Location = new System.Drawing.Point(528, 444);
+            this.labelControl13.Name = "labelControl13";
+            this.labelControl13.Size = new System.Drawing.Size(97, 29);
+            this.labelControl13.TabIndex = 26;
+            this.labelControl13.Text = "AO채널 : ";
+            // 
+            // labelControl14
+            // 
+            this.labelControl14.Location = new System.Drawing.Point(534, 505);
+            this.labelControl14.Name = "labelControl14";
+            this.labelControl14.Size = new System.Drawing.Size(91, 29);
+            this.labelControl14.TabIndex = 27;
+            this.labelControl14.Text = "DI채널 : ";
+            // 
+            // labelControl15
+            // 
+            this.labelControl15.Location = new System.Drawing.Point(526, 560);
+            this.labelControl15.Name = "labelControl15";
+            this.labelControl15.Size = new System.Drawing.Size(99, 29);
+            this.labelControl15.TabIndex = 28;
+            this.labelControl15.Text = "DO채널 : ";
+            // 
+            // cmbAiCh
+            // 
+            this.cmbAiCh.EditValue = "8";
+            this.cmbAiCh.Location = new System.Drawing.Point(630, 375);
+            this.cmbAiCh.Name = "cmbAiCh";
+            this.cmbAiCh.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.cmbAiCh.Properties.Items.AddRange(new object[] {
+            "4",
+            "8",
+            "16"});
+            this.cmbAiCh.Size = new System.Drawing.Size(78, 44);
+            this.cmbAiCh.TabIndex = 29;
+            // 
+            // cmbAoCh
+            // 
+            this.cmbAoCh.EditValue = "8";
+            this.cmbAoCh.Location = new System.Drawing.Point(630, 440);
+            this.cmbAoCh.Name = "cmbAoCh";
+            this.cmbAoCh.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.cmbAoCh.Properties.Items.AddRange(new object[] {
+            "4",
+            "8",
+            "16"});
+            this.cmbAoCh.Size = new System.Drawing.Size(78, 44);
+            this.cmbAoCh.TabIndex = 30;
+            // 
+            // cmbDiCh
+            // 
+            this.cmbDiCh.EditValue = "16";
+            this.cmbDiCh.Location = new System.Drawing.Point(630, 496);
+            this.cmbDiCh.Name = "cmbDiCh";
+            this.cmbDiCh.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.cmbDiCh.Properties.Items.AddRange(new object[] {
+            "16",
+            "32"});
+            this.cmbDiCh.Size = new System.Drawing.Size(78, 44);
+            this.cmbDiCh.TabIndex = 31;
+            // 
+            // cmbDoCh
+            // 
+            this.cmbDoCh.EditValue = "16";
+            this.cmbDoCh.Location = new System.Drawing.Point(630, 556);
+            this.cmbDoCh.Name = "cmbDoCh";
+            this.cmbDoCh.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.cmbDoCh.Properties.Items.AddRange(new object[] {
+            "16",
+            "32"});
+            this.cmbDoCh.Size = new System.Drawing.Size(78, 44);
+            this.cmbDoCh.TabIndex = 32;
+            // 
             // FormCreateProj
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 29F);
@@ -331,6 +437,10 @@ namespace auto_proj.Form
             ((System.ComponentModel.ISupportInitialize)(this.cmbCustomer.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmbPlcBrand.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmbPlcCount.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cmbAiCh.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cmbAoCh.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cmbDiCh.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cmbDoCh.Properties)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -363,5 +473,13 @@ namespace auto_proj.Form
         private DevExpress.XtraEditors.ComboBoxEdit cmbHmi;
         private DevExpress.XtraEditors.ComboBoxEdit cmbCustomer;
         private DevExpress.XtraEditors.LabelControl labelControl11;
+        private DevExpress.XtraEditors.ComboBoxEdit cmbDoCh;
+        private DevExpress.XtraEditors.ComboBoxEdit cmbDiCh;
+        private DevExpress.XtraEditors.ComboBoxEdit cmbAoCh;
+        private DevExpress.XtraEditors.ComboBoxEdit cmbAiCh;
+        private DevExpress.XtraEditors.LabelControl labelControl15;
+        private DevExpress.XtraEditors.LabelControl labelControl14;
+        private DevExpress.XtraEditors.LabelControl labelControl13;
+        private DevExpress.XtraEditors.LabelControl labelControl12;
     }
 }

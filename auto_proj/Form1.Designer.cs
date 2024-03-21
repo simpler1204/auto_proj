@@ -36,9 +36,11 @@ namespace auto_proj
             this.menuStandardInfo = new DevExpress.XtraBars.BarSubItem();
             this.subCustomer = new DevExpress.XtraBars.BarButtonItem();
             this.subPlcBrand = new DevExpress.XtraBars.BarButtonItem();
+            this.subHmiBrand = new DevExpress.XtraBars.BarButtonItem();
             this.barSubItem2 = new DevExpress.XtraBars.BarSubItem();
             this.subCreationProj = new DevExpress.XtraBars.BarButtonItem();
             this.subIOCount = new DevExpress.XtraBars.BarButtonItem();
+            this.subModule = new DevExpress.XtraBars.BarButtonItem();
             this.barButtonItem2 = new DevExpress.XtraBars.BarButtonItem();
             this.barSubItem3 = new DevExpress.XtraBars.BarSubItem();
             this.barButtonItem3 = new DevExpress.XtraBars.BarButtonItem();
@@ -49,7 +51,6 @@ namespace auto_proj
             this.barDockControlRight = new DevExpress.XtraBars.BarDockControl();
             this.subCreateProj = new DevExpress.XtraBars.BarButtonItem();
             this.barSubItem1 = new DevExpress.XtraBars.BarSubItem();
-            this.subHmiBrand = new DevExpress.XtraBars.BarButtonItem();
             ((System.ComponentModel.ISupportInitialize)(this.barManager1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -83,9 +84,10 @@ namespace auto_proj
             this.barSubItem4,
             this.subIOCount,
             this.subCustomer,
-            this.subHmiBrand});
+            this.subHmiBrand,
+            this.subModule});
             this.barManager1.MainMenu = this.bar3;
-            this.barManager1.MaxItemId = 21;
+            this.barManager1.MaxItemId = 22;
             // 
             // bar3
             // 
@@ -126,6 +128,13 @@ namespace auto_proj
             this.subPlcBrand.Name = "subPlcBrand";
             this.subPlcBrand.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.subPlcBrand_ItemClick);
             // 
+            // subHmiBrand
+            // 
+            this.subHmiBrand.Caption = "HMI 종류";
+            this.subHmiBrand.Id = 20;
+            this.subHmiBrand.Name = "subHmiBrand";
+            this.subHmiBrand.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.subHmiBrand_ItemClick);
+            // 
             // barSubItem2
             // 
             this.barSubItem2.Caption = "설계팀";
@@ -133,6 +142,7 @@ namespace auto_proj
             this.barSubItem2.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
             new DevExpress.XtraBars.LinkPersistInfo(this.subCreationProj),
             new DevExpress.XtraBars.LinkPersistInfo(this.subIOCount),
+            new DevExpress.XtraBars.LinkPersistInfo(this.subModule),
             new DevExpress.XtraBars.LinkPersistInfo(this.barButtonItem2)});
             this.barSubItem2.Name = "barSubItem2";
             // 
@@ -149,6 +159,13 @@ namespace auto_proj
             this.subIOCount.Id = 18;
             this.subIOCount.Name = "subIOCount";
             this.subIOCount.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.subIOCount_ItemClick);
+            // 
+            // subModule
+            // 
+            this.subModule.Caption = "Panel Module 수량";
+            this.subModule.Id = 21;
+            this.subModule.Name = "subModule";
+            this.subModule.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.subModule_ItemClick);
             // 
             // barButtonItem2
             // 
@@ -221,13 +238,6 @@ namespace auto_proj
             this.barSubItem1.Id = 10;
             this.barSubItem1.Name = "barSubItem1";
             // 
-            // subHmiBrand
-            // 
-            this.subHmiBrand.Caption = "HMI 종류";
-            this.subHmiBrand.Id = 20;
-            this.subHmiBrand.Name = "subHmiBrand";
-            this.subHmiBrand.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.subHmiBrand_ItemClick);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 29F);
@@ -269,6 +279,7 @@ namespace auto_proj
         private DevExpress.XtraBars.BarButtonItem subIOCount;
         private DevExpress.XtraBars.BarButtonItem subCustomer;
         private DevExpress.XtraBars.BarButtonItem subHmiBrand;
+        private DevExpress.XtraBars.BarButtonItem subModule;
     }
 }
 

@@ -13,12 +13,13 @@ using auto_proj.Classes;
 using System.Runtime.InteropServices;
 using auto_proj.Enum;
 using System.IO;
+using System.Data.SqlClient;
 
 namespace auto_proj.Form
 {
     public partial class FormCreateSystemIO : DevExpress.XtraEditors.XtraForm
     {
-        Project project;
+        Project project = null;
         PopupSelectProj selectProj = null;
 
         Microsoft.Office.Interop.Excel.Application xlApp = null;
@@ -29,14 +30,16 @@ namespace auto_proj.Form
         
         string sludgeName = "SLUDGE";
         string[] arrWorkingPart = { "INST", "PKG", "MCC", "공조제어" };
-        //string[] arrWorkingPart = { "INST" };
+        //string[] arrWorkingPart = { "INST","PKG", "MCC" };
         string[] arrIoTypeNames = new string[4];
 
         DataTable dtInst = new DataTable();
         DataTable dtPkg = new DataTable();
         DataTable dtMcc = new DataTable();
         DataTable dtHvac = new DataTable();
-
+        DataTable dtTempSum = new DataTable();
+        DataTable dtSaved = new DataTable();
+        
 
 
         public FormCreateSystemIO()
@@ -50,11 +53,13 @@ namespace auto_proj.Form
             selectProj.SelectedProj += SelectProj_SelectedProj;
             selectProj.ShowDialog();
             selectProj.SelectedProj -= SelectProj_SelectedProj;
+
+            CreateDataTable();
+            SelectDetailIoTitle(project.ProjID);
         }
 
         private void SelectProj_SelectedProj(object sender, EventArgs e)
-        {           
-
+        {
             project = ((PopupSelectProj.SelectedProjArgs)e).project;
             txtCode.Text = project.ProjCode;
             txtName.Text = project.ProjName;
@@ -66,6 +71,11 @@ namespace auto_proj.Form
             txtDo.Text = project.DoDefine;
             txtInst.Text = project.InstFileName;
             txtCreated.Text = project.Created.ToString("yyyy-MM-dd HH:mm:ss");
+
+            txtAiCh.Text = project.AiChannel.ToString();
+            txtAoCh.Text = project.AoChannel.ToString();
+            txtDiCh.Text = project.DiChannel.ToString();
+            txtDoCh.Text = project.DoChannel.ToString();
         }
 
         private void simpleButton1_Click(object sender, EventArgs e)
@@ -263,27 +273,8 @@ namespace auto_proj.Form
                                     if (j == 3) partIoCount[h].DO_COUNT++;
                                 }
                             }
-                        }
-
-                        //    if (sheet.XlRange.Cells[i, ioTypeColumn].Value2.ToString().Trim() == "ANALOG INPUT" && sheet.XlRange.Cells[i, plcColumn].Value2.ToString().Trim() == "PLC1")
-                        //        plc1_aiCount++;
-                        //    else if (sheet.XlRange.Cells[i, ioTypeColumn].Value2.ToString().Trim() == "ANALOG INPUT" && sheet.XlRange.Cells[i, plcColumn].Value2.ToString().Trim() == "PLC2")
-                        //        plc2_aiCount++;
-                        //    else if (sheet.XlRange.Cells[i, ioTypeColumn].Value2.ToString().Trim() == "ANALOG OUTPUT" && sheet.XlRange.Cells[i, plcColumn].Value2.ToString().Trim() == "PLC1")
-                        //        plc1_aoCount++;
-                        //    else if (sheet.XlRange.Cells[i, ioTypeColumn].Value2.ToString().Trim() == "ANALOG OUTPUT" && sheet.XlRange.Cells[i, plcColumn].Value2.ToString().Trim() == "PLC2")
-                        //        plc2_aoCount++;
-                        //    else if (sheet.XlRange.Cells[i, ioTypeColumn].Value2.ToString().Trim() == "DISCRETE INPUT" && sheet.XlRange.Cells[i, plcColumn].Value2.ToString().Trim() == "PLC1")
-                        //        plc1_diCount++;
-                        //    else if (sheet.XlRange.Cells[i, ioTypeColumn].Value2.ToString().Trim() == "DISCRETE INPUT" && sheet.XlRange.Cells[i, plcColumn].Value2.ToString().Trim() == "PLC2")
-                        //        plc2_diCount++;
-                        //    else if (sheet.XlRange.Cells[i, ioTypeColumn].Value2.ToString().Trim() == "DISCRETE OUTPUT" && sheet.XlRange.Cells[i, plcColumn].Value2.ToString().Trim() == "PLC1")
-                        //        plc1_doCount++;
-                        //    else if (sheet.XlRange.Cells[i, ioTypeColumn].Value2.ToString().Trim() == "DISCRETE OUTPUT" && sheet.XlRange.Cells[i, plcColumn].Value2.ToString().Trim() == "PLC2")
-                        //        plc2_doCount++;
-                        //
+                        }                      
                     }
-
                 }
                
                 plcIoCountList.Add(partIoCount);
@@ -292,7 +283,6 @@ namespace auto_proj.Form
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
-               // MessageBox.Show(ex.Message, "error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 throw ex;
             }
         }
@@ -321,7 +311,6 @@ namespace auto_proj.Form
             {                
                 sheet.Close();
             }
-
            
             Marshal.ReleaseComObject(xlWorkbook);           
             xlApp.Quit();
@@ -329,8 +318,143 @@ namespace auto_proj.Form
         }
 
         private void FormCreateSystemIO_Load(object sender, EventArgs e)
-        {           
-            CreateDataTable();
+        {   
+            chkInst.CheckedChanged += ChkInst_CheckedChanged;
+            chkPkg.CheckedChanged += ChkInst_CheckedChanged;
+            chkMcc.CheckedChanged += ChkInst_CheckedChanged;
+            chkHvac.CheckedChanged += ChkInst_CheckedChanged;
+
+            cmbDetailIo.SelectedValueChanged += CmbDetailIo_SelectedValueChanged;
+        }
+
+        private void CmbDetailIo_SelectedValueChanged(object sender, EventArgs e)
+        {
+            string selected = cmbDetailIo.Text;
+            SelectDetailIoList(project.ProjID, selected);
+        }
+
+        private void ChkInst_CheckedChanged(object sender, EventArgs e)
+        {
+            lblTitle.Text = "";
+
+            List<string> lists = new List<string>();
+
+            if (chkInst.Checked) lists.Add("INST");
+            if (chkPkg.Checked) lists.Add("PKG");
+            if (chkMcc.Checked) lists.Add("MCC");
+            if (chkHvac.Checked) lists.Add("HVAC");
+
+            foreach(var title in lists)
+            {
+                lblTitle.Text += title + " ";
+            }
+
+            GetSumIoCount();
+        }
+
+        private void GetSumIoCount()
+        {
+            if (project == null) return;
+
+            int[,] aiSum = new int[project.PlcCount, 1];
+            int[,] aoSum = new int[project.PlcCount, 1];
+            int[,] diSum = new int[project.PlcCount, 1];
+            int[,] doSum = new int[project.PlcCount, 1];
+            int aiTotal = 0, aoTotal = 0, diTotal = 0, doTotal = 0;
+
+            DataRow[] instArr = dtInst.Select();
+            DataRow[] pkgArr = dtPkg.Select();
+            DataRow[] mccArr = dtMcc.Select();
+            DataRow[] hvacArr = dtHvac.Select();
+            DataRow[] tempArr = dtTempSum.Select();
+
+
+            for (int i = 0; i < project.PlcCount; i++)  //cpu  수량만큼  
+            {
+                tempArr[i]["AI"] = 0;
+                tempArr[i]["AO"] = 0;
+                tempArr[i]["DI"] = 0;
+                tempArr[i]["DO"] = 0;
+            }
+
+
+            if (chkInst.Checked)
+            {
+                if (instArr.Length < 1) return;
+
+                for (int i = 0; i < project.PlcCount; i++)  //cpu  수량 만큼  
+                {
+                    tempArr[i]["AI"] = int.Parse(tempArr[i]["AI"].ToString()) + int.Parse(instArr[i]["AI"].ToString()); aiTotal += int.Parse(instArr[i]["AI"].ToString());
+                    tempArr[i]["AO"] = int.Parse(tempArr[i]["AO"].ToString()) + int.Parse(instArr[i]["AO"].ToString()); aoTotal += int.Parse(instArr[i]["AO"].ToString());
+                    tempArr[i]["DI"] = int.Parse(tempArr[i]["DI"].ToString()) + int.Parse(instArr[i]["DI"].ToString()); diTotal += int.Parse(instArr[i]["DI"].ToString());
+                    tempArr[i]["DO"] = int.Parse(tempArr[i]["DO"].ToString()) + int.Parse(instArr[i]["DO"].ToString()); doTotal += int.Parse(instArr[i]["DO"].ToString());
+
+                }
+            }
+
+            if (chkPkg.Checked)
+            {
+                if (pkgArr.Length < 1) return;
+                for (int i = 0; i < project.PlcCount; i++)  //cpu  수량 만큼  
+                {
+                    tempArr[i]["AI"] = int.Parse(tempArr[i]["AI"].ToString()) + int.Parse(pkgArr[i]["AI"].ToString()); aiTotal += int.Parse(pkgArr[i]["AI"].ToString());
+                    tempArr[i]["AO"] = int.Parse(tempArr[i]["AO"].ToString()) + int.Parse(pkgArr[i]["AO"].ToString()); aoTotal += int.Parse(pkgArr[i]["AO"].ToString());
+                    tempArr[i]["DI"] = int.Parse(tempArr[i]["DI"].ToString()) + int.Parse(pkgArr[i]["DI"].ToString()); diTotal += int.Parse(pkgArr[i]["DI"].ToString());
+                    tempArr[i]["DO"] = int.Parse(tempArr[i]["DO"].ToString()) + int.Parse(pkgArr[i]["DO"].ToString()); doTotal += int.Parse(pkgArr[i]["DO"].ToString());
+
+                }
+            }
+
+            if (chkMcc.Checked)
+            {
+                if (mccArr.Length < 1) return;
+                for (int i = 0; i < project.PlcCount; i++)  //cpu  수량 만큼  
+                {
+                    tempArr[i]["AI"] = int.Parse(tempArr[i]["AI"].ToString()) + int.Parse(mccArr[i]["AI"].ToString()); aiTotal += int.Parse(mccArr[i]["AI"].ToString());
+                    tempArr[i]["AO"] = int.Parse(tempArr[i]["AO"].ToString()) + int.Parse(mccArr[i]["AO"].ToString()); aoTotal += int.Parse(mccArr[i]["AO"].ToString());
+                    tempArr[i]["DI"] = int.Parse(tempArr[i]["DI"].ToString()) + int.Parse(mccArr[i]["DI"].ToString()); diTotal += int.Parse(mccArr[i]["DI"].ToString());
+                    tempArr[i]["DO"] = int.Parse(tempArr[i]["DO"].ToString()) + int.Parse(mccArr[i]["DO"].ToString()); doTotal += int.Parse(mccArr[i]["DO"].ToString());
+                }
+            }
+
+            if (chkHvac.Checked)
+            {
+                if (hvacArr.Length < 1) return;
+                for (int i = 0; i < project.PlcCount; i++)  //cpu  수량 만큼  
+                {
+                    tempArr[i]["AI"] = int.Parse(tempArr[i]["AI"].ToString()) + int.Parse(hvacArr[i]["AI"].ToString()); aiTotal += int.Parse(hvacArr[i]["AI"].ToString());
+                    tempArr[i]["AO"] = int.Parse(tempArr[i]["AO"].ToString()) + int.Parse(hvacArr[i]["AO"].ToString()); aoTotal += int.Parse(hvacArr[i]["AO"].ToString());
+                    tempArr[i]["DI"] = int.Parse(tempArr[i]["DI"].ToString()) + int.Parse(hvacArr[i]["DI"].ToString()); diTotal += int.Parse(hvacArr[i]["DI"].ToString());
+                    tempArr[i]["DO"] = int.Parse(tempArr[i]["DO"].ToString()) + int.Parse(hvacArr[i]["DO"].ToString()); doTotal += int.Parse(hvacArr[i]["DO"].ToString());
+                }
+            }
+
+            //합계
+            tempArr[project.PlcCount]["AI"] = aiTotal;
+            tempArr[project.PlcCount]["AO"] = aoTotal;
+            tempArr[project.PlcCount]["DI"] = diTotal;
+            tempArr[project.PlcCount]["DO"] = doTotal;
+
+
+            //스페어 
+            tempArr[project.PlcCount + 1]["AI"] = (int)Math.Ceiling(aiTotal * 0.3);
+            tempArr[project.PlcCount + 1]["AO"] = (int)Math.Ceiling(aoTotal * 0.3);
+            tempArr[project.PlcCount + 1]["DI"] = (int)Math.Ceiling(diTotal * 0.3);
+            tempArr[project.PlcCount + 1]["DO"] = (int)Math.Ceiling(doTotal * 0.3);
+
+            //Total
+            tempArr[project.PlcCount + 2]["AI"] = (int)Math.Ceiling(aiTotal + (aiTotal * 0.3));
+            tempArr[project.PlcCount + 2]["AO"] = (int)Math.Ceiling(aoTotal + (aoTotal * 0.3));
+            tempArr[project.PlcCount + 2]["DI"] = (int)Math.Ceiling(diTotal + (diTotal * 0.3));
+            tempArr[project.PlcCount + 2]["DO"] = (int)Math.Ceiling(doTotal + (doTotal * 0.3));
+
+            //module
+            tempArr[project.PlcCount + 3]["AI"] = (int)Math.Ceiling((aiTotal + (aiTotal * 0.3)) / project.AiChannel);
+            tempArr[project.PlcCount + 3]["AO"] = (int)Math.Ceiling((aoTotal + (aoTotal * 0.3)) / project.AoChannel);
+            tempArr[project.PlcCount + 3]["DI"] = (int)Math.Ceiling((diTotal + (diTotal * 0.3)) / project.DiChannel);
+            tempArr[project.PlcCount + 3]["DO"] = (int)Math.Ceiling((doTotal + (doTotal * 0.3)) / project.DoChannel);
+
+            gridTemp.DataSource = dtTempSum;
         }
 
         private void CreateDataTable()
@@ -352,8 +476,343 @@ namespace auto_proj.Form
                 dt.Columns.Add(column4);
                 dt.Columns.Add(column5);
                 dt.Columns.Add(column6);
+            }
 
+            {// 합계를 위한 임시 DataTable 
+                DataColumn column1 = new DataColumn("TITLE", typeof(string));
+                DataColumn column2 = new DataColumn("AI", typeof(int));
+                DataColumn column3 = new DataColumn("AO", typeof(int));
+                DataColumn column4 = new DataColumn("DI", typeof(int));
+                DataColumn column5 = new DataColumn("DO", typeof(int));
+
+                dtTempSum.Columns.Add(column1);
+                dtTempSum.Columns.Add(column2);
+                dtTempSum.Columns.Add(column3);
+                dtTempSum.Columns.Add(column4);
+                dtTempSum.Columns.Add(column5);
+
+                for (int i=0; i<project.PlcCount; i++)
+                {
+                    DataRow row = dtTempSum.NewRow();
+                    row["TITLE"] = "PLC" + (i + 1).ToString();
+                    row["AI"] = 0;
+                    row["AO"] = 0;
+                    row["DI"] = 0;
+                    row["DO"] = 0;
+
+                    dtTempSum.Rows.Add(row);
+                }
+                {
+                    DataRow row = dtTempSum.NewRow();
+                    row["TITLE"] = "SUM";
+                    row["AI"] = 0;
+                    row["AO"] = 0;
+                    row["DI"] = 0;
+                    row["DO"] = 0;
+
+                    dtTempSum.Rows.Add(row);
+                }
+                {
+                    DataRow row = dtTempSum.NewRow();
+                    row["TITLE"] = "SPARE";
+                    row["AI"] = 0;
+                    row["AO"] = 0;
+                    row["DI"] = 0;
+                    row["DO"] = 0;
+
+                    dtTempSum.Rows.Add(row);
+                }
+                {
+                    DataRow row = dtTempSum.NewRow();
+                    row["TITLE"] = "TOTAL";
+                    row["AI"] = 0;
+                    row["AO"] = 0;
+                    row["DI"] = 0;
+                    row["DO"] = 0;
+
+                    dtTempSum.Rows.Add(row);
+                }
+
+                {
+                    DataRow row = dtTempSum.NewRow();
+                    row["TITLE"] = "MODULE";
+                    row["AI"] = 0;
+                    row["AO"] = 0;
+                    row["DI"] = 0;
+                    row["DO"] = 0;
+
+                    dtTempSum.Rows.Add(row);
+                }
+            }
+
+            {// 저장되 IO 불러오기 위한 
+                DataColumn column1 = new DataColumn("TITLE", typeof(string));
+                DataColumn column2 = new DataColumn("AI", typeof(int));
+                DataColumn column3 = new DataColumn("AO", typeof(int));
+                DataColumn column4 = new DataColumn("DI", typeof(int));
+                DataColumn column5 = new DataColumn("DO", typeof(int));
+
+                dtSaved.Columns.Add(column1);
+                dtSaved.Columns.Add(column2);
+                dtSaved.Columns.Add(column3);
+                dtSaved.Columns.Add(column4);
+                dtSaved.Columns.Add(column5);
+
+                for (int i = 0; i < project.PlcCount; i++)
+                {
+                    DataRow row = dtSaved.NewRow();
+                    row["TITLE"] = "PLC" + (i + 1).ToString();
+                    row["AI"] = 0;
+                    row["AO"] = 0;
+                    row["DI"] = 0;
+                    row["DO"] = 0;
+
+                    dtSaved.Rows.Add(row);
+                }
+                {
+                    DataRow row = dtSaved.NewRow();
+                    row["TITLE"] = "SUM";
+                    row["AI"] = 0;
+                    row["AO"] = 0;
+                    row["DI"] = 0;
+                    row["DO"] = 0;
+
+                    dtSaved.Rows.Add(row);
+                }
+                {
+                    DataRow row = dtSaved.NewRow();
+                    row["TITLE"] = "SPARE";
+                    row["AI"] = 0;
+                    row["AO"] = 0;
+                    row["DI"] = 0;
+                    row["DO"] = 0;
+
+                    dtSaved.Rows.Add(row);
+                }
+                {
+                    DataRow row = dtSaved.NewRow();
+                    row["TITLE"] = "TOTAL";
+                    row["AI"] = 0;
+                    row["AO"] = 0;
+                    row["DI"] = 0;
+                    row["DO"] = 0;
+
+                    dtSaved.Rows.Add(row);
+                }
+
+                {
+                    DataRow row = dtSaved.NewRow();
+                    row["TITLE"] = "MODULE";
+                    row["AI"] = 0;
+                    row["AO"] = 0;
+                    row["DI"] = 0;
+                    row["DO"] = 0;
+
+                    dtSaved.Rows.Add(row);
+                }
+            }
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            if (gridTemp.DataSource == null) return;
+            string mainTitle = lblTitle.Text.Trim();
+            if (mainTitle == "") return;
+
+            bool isExistDetailIo = checkExistDetailIo(project.ProjID, mainTitle);
+
+            if (isExistDetailIo)
+            {
+                MessageBox.Show($"{mainTitle}이 이미 존재합니다? 삭제 후 진행 바랍니다.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DialogResult result = MessageBox.Show($"{mainTitle}를 저장 하시겠습니까?", "Save", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Information);
+            if (result == DialogResult.Cancel) return;
+
+            string connectString = SIDS.Instance.MakeConnectionString("DB");
+            using(SqlConnection DBConn = new SqlConnection(connectString))
+            {
+                string query = @"INSERT INTO project_detail_io(project_id, main_title, sub_title, ai_count, ao_count, di_count, do_count)
+                                VALUES(@proj_id, @main_title, @sub_title, @ai_count, @ao_count, @di_count, @do_count)";
+
+                DataRow[] rows = dtTempSum.Select();
+
+                foreach(var row in rows)
+                {
+                    using (SqlCommand cmd = new SqlCommand(query, DBConn))
+                    {
+                        cmd.Parameters.Add("@proj_id", SqlDbType.Int).Value = project.ProjID;
+                        cmd.Parameters.Add("@main_title", SqlDbType.NVarChar).Value = lblTitle.Text.Trim();
+                        cmd.Parameters.Add("@sub_title", SqlDbType.NVarChar).Value = row["TITLE"].ToString();
+                        cmd.Parameters.Add("@ai_count", SqlDbType.Int).Value = int.Parse(row["AI"].ToString());
+                        cmd.Parameters.Add("@ao_count", SqlDbType.Int).Value = int.Parse(row["AO"].ToString());
+                        cmd.Parameters.Add("@di_count", SqlDbType.Int).Value = int.Parse(row["DI"].ToString());
+                        cmd.Parameters.Add("@do_count", SqlDbType.Int).Value = int.Parse(row["DO"].ToString());
+
+                        try
+                        {
+                            DBConn.Open();
+                            cmd.ExecuteNonQuery();
+                        }
+                        catch(Exception ex)
+                        {
+                            MessageBox.Show(ex.ToString());
+                        }
+                        finally
+                        {
+                            DBConn.Close();
+                        }
+                    }
+                }                
+            }
+
+            gridTemp.DataSource = null;
+
+            dtSaved = dtTempSum.Copy();
+            gridSaved.DataSource = dtSaved;
+            SelectDetailIoTitle(project.ProjID);
+            cmbDetailIo.Text = mainTitle;
+            lblTitle.Text = "";
+            chkInst.Checked = false;
+            chkPkg.Checked = false;
+            chkMcc.Checked = false;
+            chkHvac.Checked = false;
+            MessageBox.Show($"{mainTitle} 저장이 완료 되었습니다.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private bool checkExistDetailIo(int projId, string mainTitle)
+        {
+            int count = 0;
+            string connectString = SIDS.Instance.MakeConnectionString("DB");
+            using (SqlConnection conn = new SqlConnection(connectString))
+            {
+                string query = "SELECT COUNT(project_id) FROM project_detail_io WHERE project_id = @proj_id and main_title = @main_title";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.Add("@proj_id", SqlDbType.Int).Value = projId;
+                    cmd.Parameters.Add("@main_title", SqlDbType.NVarChar).Value = mainTitle;
+
+                    conn.Open();
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        int.TryParse(reader[0].ToString(), out count);
+                    }
+                }
+            }
+
+            return count > 0;
+        }
+
+        private void DeleteDetailIoList(int projId, string mainTitle)
+        {
+            DialogResult result = MessageBox.Show($"{mainTitle}를 삭제 하시겠습니까?", "Remove", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+            if (result == DialogResult.Cancel) return;
+
+            string connectString = SIDS.Instance.MakeConnectionString("DB");
+            using (SqlConnection conn = new SqlConnection(connectString))
+            {
+                string query = "DELETE project_detail_io WHERE project_id = @proj_id and main_title = @main_title";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.Add("@proj_id", SqlDbType.Int).Value = projId;
+                    cmd.Parameters.Add("@main_title", SqlDbType.NVarChar).Value = mainTitle;
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
             }            
+        }
+
+        private void SelectDetailIoTitle(int projId)
+        {
+
+            cmbDetailIo.Properties.Items.Clear();
+            string connectString = SIDS.Instance.MakeConnectionString("DB");
+            using (SqlConnection conn = new SqlConnection(connectString))
+            {
+                string query = "SELECT distinct main_title FROM project_detail_io WHERE project_id = @proj_id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.Add("@proj_id", SqlDbType.Int).Value = projId;
+
+                    conn.Open();
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        cmbDetailIo.Properties.Items.Add(reader[0].ToString());
+                    }
+                }
+            }
+            if(cmbDetailIo.Properties.Items.Count > 0)
+            {
+                cmbDetailIo.SelectedIndex = 0;
+            }
+        }
+
+        private void SelectDetailIoTitle(int projId, string mainTitle)
+        {
+            cmbDetailIo.Properties.Items.Clear();
+            string connectString = SIDS.Instance.MakeConnectionString("DB");
+            using (SqlConnection conn = new SqlConnection(connectString))
+            {
+                string query = "SELECT distinct main_title FROM project_detail_io WHERE project_id = @proj_id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.Add("@proj_id", SqlDbType.Int).Value = projId;
+
+                    conn.Open();
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        cmbDetailIo.Properties.Items.Add(reader[0].ToString());
+                    }
+                }
+            }
+            cmbDetailIo.Text = mainTitle;
+        }
+
+        private void SelectDetailIoList(int projId, string mainTitle)
+        {
+            dtSaved.Rows.Clear();
+
+            string connectString = SIDS.Instance.MakeConnectionString("DB");
+            using (SqlConnection conn = new SqlConnection(connectString))
+            {
+                string query = "SELECT sub_title, ai_count, ao_count, di_count, do_count FROM project_detail_io WHERE project_id = @proj_id and main_title = @main_title" ;
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.Add("@proj_id", SqlDbType.Int).Value = projId;
+                    cmd.Parameters.Add("@main_title", SqlDbType.NVarChar).Value = mainTitle;
+
+                    conn.Open();
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        DataRow row = dtSaved.NewRow();
+                        row["TITLE"] = reader["sub_title"].ToString();
+                        row["AI"] = int.Parse(reader["ai_count"].ToString());
+                        row["AO"] = int.Parse(reader["ao_count"].ToString());
+                        row["DI"] = int.Parse(reader["di_count"].ToString());
+                        row["DO"] = int.Parse(reader["do_count"].ToString());
+                        dtSaved.Rows.Add(row);
+                    }
+                }
+            }
+            gridSaved.DataSource = dtSaved;
+
+        }
+
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            string mainTitle = cmbDetailIo.Text.Trim();
+            DeleteDetailIoList(project.ProjID, mainTitle);
+            SelectDetailIoTitle(project.ProjID);
         }
     }
 }
