@@ -865,10 +865,10 @@ namespace auto_proj.Form
             // 
             // gridTemp
             // 
-            this.gridTemp.Location = new System.Drawing.Point(69, 99);
+            this.gridTemp.Location = new System.Drawing.Point(13, 99);
             this.gridTemp.MainView = this.gridView5;
             this.gridTemp.Name = "gridTemp";
-            this.gridTemp.Size = new System.Drawing.Size(747, 410);
+            this.gridTemp.Size = new System.Drawing.Size(866, 410);
             this.gridTemp.TabIndex = 5;
             this.gridTemp.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView5});
@@ -882,16 +882,20 @@ namespace auto_proj.Form
             this.gridColumn28,
             this.gridColumn29});
             this.gridView5.GridControl = this.gridTemp;
+            this.gridView5.GroupSummary.AddRange(new DevExpress.XtraGrid.GridSummaryItem[] {
+            new DevExpress.XtraGrid.GridGroupSummaryItem(DevExpress.Data.SummaryItemType.Sum, "", this.gridColumn26, "SUM:{0}")});
             this.gridView5.Name = "gridView5";
+            this.gridView5.OptionsView.ShowGroupPanel = false;
             // 
             // gridColumn25
             // 
             this.gridColumn25.FieldName = "TITLE";
             this.gridColumn25.MinWidth = 40;
             this.gridColumn25.Name = "gridColumn25";
+            this.gridColumn25.OptionsColumn.FixedWidth = true;
             this.gridColumn25.Visible = true;
             this.gridColumn25.VisibleIndex = 0;
-            this.gridColumn25.Width = 150;
+            this.gridColumn25.Width = 200;
             // 
             // gridColumn26
             // 
@@ -901,7 +905,7 @@ namespace auto_proj.Form
             this.gridColumn26.Name = "gridColumn26";
             this.gridColumn26.Visible = true;
             this.gridColumn26.VisibleIndex = 1;
-            this.gridColumn26.Width = 150;
+            this.gridColumn26.Width = 157;
             // 
             // gridColumn27
             // 
@@ -911,7 +915,7 @@ namespace auto_proj.Form
             this.gridColumn27.Name = "gridColumn27";
             this.gridColumn27.Visible = true;
             this.gridColumn27.VisibleIndex = 2;
-            this.gridColumn27.Width = 150;
+            this.gridColumn27.Width = 157;
             // 
             // gridColumn28
             // 
@@ -921,7 +925,7 @@ namespace auto_proj.Form
             this.gridColumn28.Name = "gridColumn28";
             this.gridColumn28.Visible = true;
             this.gridColumn28.VisibleIndex = 3;
-            this.gridColumn28.Width = 150;
+            this.gridColumn28.Width = 157;
             // 
             // gridColumn29
             // 
@@ -931,7 +935,7 @@ namespace auto_proj.Form
             this.gridColumn29.Name = "gridColumn29";
             this.gridColumn29.Visible = true;
             this.gridColumn29.VisibleIndex = 4;
-            this.gridColumn29.Width = 150;
+            this.gridColumn29.Width = 159;
             // 
             // groupControl3
             // 
@@ -964,10 +968,10 @@ namespace auto_proj.Form
             // 
             // gridSaved
             // 
-            this.gridSaved.Location = new System.Drawing.Point(69, 107);
+            this.gridSaved.Location = new System.Drawing.Point(13, 107);
             this.gridSaved.MainView = this.gridView6;
             this.gridSaved.Name = "gridSaved";
-            this.gridSaved.Size = new System.Drawing.Size(747, 410);
+            this.gridSaved.Size = new System.Drawing.Size(866, 410);
             this.gridSaved.TabIndex = 7;
             this.gridSaved.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView6});
@@ -982,15 +986,17 @@ namespace auto_proj.Form
             this.gridColumn34});
             this.gridView6.GridControl = this.gridSaved;
             this.gridView6.Name = "gridView6";
+            this.gridView6.OptionsView.ShowGroupPanel = false;
             // 
             // gridColumn30
             // 
             this.gridColumn30.FieldName = "TITLE";
-            this.gridColumn30.MinWidth = 40;
+            this.gridColumn30.MinWidth = 60;
             this.gridColumn30.Name = "gridColumn30";
+            this.gridColumn30.OptionsColumn.FixedWidth = true;
             this.gridColumn30.Visible = true;
             this.gridColumn30.VisibleIndex = 0;
-            this.gridColumn30.Width = 150;
+            this.gridColumn30.Width = 200;
             // 
             // gridColumn31
             // 
@@ -1000,7 +1006,7 @@ namespace auto_proj.Form
             this.gridColumn31.Name = "gridColumn31";
             this.gridColumn31.Visible = true;
             this.gridColumn31.VisibleIndex = 1;
-            this.gridColumn31.Width = 150;
+            this.gridColumn31.Width = 157;
             // 
             // gridColumn32
             // 
@@ -1010,7 +1016,7 @@ namespace auto_proj.Form
             this.gridColumn32.Name = "gridColumn32";
             this.gridColumn32.Visible = true;
             this.gridColumn32.VisibleIndex = 2;
-            this.gridColumn32.Width = 150;
+            this.gridColumn32.Width = 157;
             // 
             // gridColumn33
             // 
@@ -1020,7 +1026,7 @@ namespace auto_proj.Form
             this.gridColumn33.Name = "gridColumn33";
             this.gridColumn33.Visible = true;
             this.gridColumn33.VisibleIndex = 3;
-            this.gridColumn33.Width = 150;
+            this.gridColumn33.Width = 157;
             // 
             // gridColumn34
             // 
@@ -1030,7 +1036,7 @@ namespace auto_proj.Form
             this.gridColumn34.Name = "gridColumn34";
             this.gridColumn34.Visible = true;
             this.gridColumn34.VisibleIndex = 4;
-            this.gridColumn34.Width = 150;
+            this.gridColumn34.Width = 159;
             // 
             // groupControl4
             // 
@@ -1054,7 +1060,7 @@ namespace auto_proj.Form
             // 
             // cmbDetailIo
             // 
-            this.cmbDetailIo.Location = new System.Drawing.Point(71, 52);
+            this.cmbDetailIo.Location = new System.Drawing.Point(13, 52);
             this.cmbDetailIo.Name = "cmbDetailIo";
             this.cmbDetailIo.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});

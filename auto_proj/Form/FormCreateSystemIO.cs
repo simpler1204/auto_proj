@@ -27,10 +27,10 @@ namespace auto_proj.Form
 
         List<Sheet> sheetList = new List<Sheet>();
         List<PartIoCount> plcIoCountList = new List<PartIoCount>();
-        
+
         string sludgeName = "SLUDGE";
         string[] arrWorkingPart = { "INST", "PKG", "MCC", "공조제어" };
-        //string[] arrWorkingPart = { "INST","PKG", "MCC" };
+        //string[] arrWorkingPart = { "INST", "PKG" };
         string[] arrIoTypeNames = new string[4];
 
         DataTable dtInst = new DataTable();
@@ -39,12 +39,12 @@ namespace auto_proj.Form
         DataTable dtHvac = new DataTable();
         DataTable dtTempSum = new DataTable();
         DataTable dtSaved = new DataTable();
-        
+
 
 
         public FormCreateSystemIO()
         {
-            InitializeComponent();           
+            InitializeComponent();
         }
 
         private void btnSelect_Click(object sender, EventArgs e)
@@ -96,7 +96,7 @@ namespace auto_proj.Form
                     GetIoTypeCount(arrWorkingPart[i], arrIoTypeNames, project.PlcCount);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
             }
@@ -133,10 +133,10 @@ namespace auto_proj.Form
                     DoGathering("HVAC", v, dtHvac, gridHvac);
                 }
             }
-        
+
         }
 
-       
+
         private void DoGathering(string part, PartIoCount v, DataTable dt, DevExpress.XtraGrid.GridControl grid)
         {
             int aiSum = 0, aoSum = 0, diSum = 0, doSum = 0;
@@ -170,7 +170,7 @@ namespace auto_proj.Form
             dt.Rows.Add(instRow);
             grid.DataSource = dt;
         }
-       
+
         private Sheet GetSheet(string sheetName)
         {
             Sheet selectedSheet = null;
@@ -195,15 +195,15 @@ namespace auto_proj.Form
                 for (int j = 1; j <= sheet.XlRange.Columns.Count; j++)
                 {
                     if (sheet.XlRange.Cells[i, j] != null && sheet.XlRange.Cells[i, j].Value2 != null)
-                    {                        
+                    {
                         if (sheet.XlRange.Cells[i, j].Value2.ToString() == "IO_Type")
                         {
                             number = j;
                             break;
                         }
                     }
-                    }
-                    if (number > 0) break;
+                }
+                if (number > 0) break;
             }
 
             return number;
@@ -212,7 +212,7 @@ namespace auto_proj.Form
         private int GetPLCColumnNumber(string sheetName)
         {
             Sheet sheet = GetSheet(sheetName);
-           
+
             int number = 0;
 
             for (int i = 1; i <= 3; i++)
@@ -240,11 +240,11 @@ namespace auto_proj.Form
             try
             {
                 Sheet sheet = GetSheet(s);
-               
+
 
                 int ioTypeColumn = GetIoTypeColumnNumber(s);
                 int plcColumn = GetPLCColumnNumber(s);
-               
+
 
                 if (sheet == null)
                 {
@@ -266,17 +266,16 @@ namespace auto_proj.Form
                             {
                                 if (sheet.XlRange.Cells[i, ioTypeColumn].Value2.ToString().Trim() == arrIoTypeNames[j] && sheet.XlRange.Cells[i, plcColumn].Value2.ToString().Trim() == "PLC" + (h + 1).ToString())
                                 {
-                                   
                                     if (j == 0) partIoCount[h].AI_COUNT++;
                                     if (j == 1) partIoCount[h].AO_COUNT++;
                                     if (j == 2) partIoCount[h].DI_COUNT++;
                                     if (j == 3) partIoCount[h].DO_COUNT++;
                                 }
                             }
-                        }                      
+                        }
                     }
                 }
-               
+
                 plcIoCountList.Add(partIoCount);
 
             }
@@ -288,8 +287,8 @@ namespace auto_proj.Form
         }
 
         private void ExcelOpen()
-        {           
-            bool isExists = BinaryFile.MakeFileFromBinary(project.InstExcel, project.InstFileName);          
+        {
+            bool isExists = BinaryFile.MakeFileFromBinary(project.InstExcel, project.InstFileName);
 
             xlApp = new Microsoft.Office.Interop.Excel.Application();
             xlWorkbook = xlApp.Workbooks.Open(Environment.CurrentDirectory + "\\" + project.InstFileName);
@@ -297,7 +296,7 @@ namespace auto_proj.Form
             for (int i = 1; i <= xlWorkbook.Worksheets.Count; i++)
             {
                 Sheet sheet = new Sheet(xlWorkbook.Worksheets[i]);
-                sheetList.Add(sheet);               
+                sheetList.Add(sheet);
             }
         }
 
@@ -308,17 +307,17 @@ namespace auto_proj.Form
             GC.WaitForPendingFinalizers();
 
             foreach (var sheet in sheetList)
-            {                
+            {
                 sheet.Close();
             }
-           
-            Marshal.ReleaseComObject(xlWorkbook);           
+
+            Marshal.ReleaseComObject(xlWorkbook);
             xlApp.Quit();
             Marshal.ReleaseComObject(xlApp);
         }
 
         private void FormCreateSystemIO_Load(object sender, EventArgs e)
-        {   
+        {
             chkInst.CheckedChanged += ChkInst_CheckedChanged;
             chkPkg.CheckedChanged += ChkInst_CheckedChanged;
             chkMcc.CheckedChanged += ChkInst_CheckedChanged;
@@ -344,7 +343,7 @@ namespace auto_proj.Form
             if (chkMcc.Checked) lists.Add("MCC");
             if (chkHvac.Checked) lists.Add("HVAC");
 
-            foreach(var title in lists)
+            foreach (var title in lists)
             {
                 lblTitle.Text += title + " ";
             }
@@ -352,22 +351,124 @@ namespace auto_proj.Form
             GetSumIoCount();
         }
 
+        /* private void GetSumIoCount()
+         {
+             if (project == null) return;
+
+             //int[,] aiSum = new int[project.PlcCount, 1];
+             //int[,] aoSum = new int[project.PlcCount, 1];
+             //int[,] diSum = new int[project.PlcCount, 1];
+             //int[,] doSum = new int[project.PlcCount, 1];
+             int aiTotal = 0, aoTotal = 0, diTotal = 0, doTotal = 0;
+
+             DataRow[] instArr = dtInst.Select();
+             DataRow[] pkgArr = dtPkg.Select();
+             DataRow[] mccArr = dtMcc.Select();
+             DataRow[] hvacArr = dtHvac.Select();
+             DataRow[] tempArr = dtTempSum.Select();
+
+
+             for (int i = 0; i < project.PlcCount; i++)  //cpu  수량만큼  
+             {
+                 tempArr[i]["AI"] = 0;
+                 tempArr[i]["AO"] = 0;
+                 tempArr[i]["DI"] = 0;
+                 tempArr[i]["DO"] = 0;
+             }
+
+
+             if (chkInst.Checked)
+             {
+                 if (instArr.Length < 1) return;
+
+                 for (int i = 0; i < project.PlcCount; i++)  //cpu  수량 만큼  
+                 {
+                     tempArr[i]["AI"] = int.Parse(tempArr[i]["AI"].ToString()) + int.Parse(instArr[i]["AI"].ToString()); aiTotal += int.Parse(instArr[i]["AI"].ToString());
+                     tempArr[i]["AO"] = int.Parse(tempArr[i]["AO"].ToString()) + int.Parse(instArr[i]["AO"].ToString()); aoTotal += int.Parse(instArr[i]["AO"].ToString());
+                     tempArr[i]["DI"] = int.Parse(tempArr[i]["DI"].ToString()) + int.Parse(instArr[i]["DI"].ToString()); diTotal += int.Parse(instArr[i]["DI"].ToString());
+                     tempArr[i]["DO"] = int.Parse(tempArr[i]["DO"].ToString()) + int.Parse(instArr[i]["DO"].ToString()); doTotal += int.Parse(instArr[i]["DO"].ToString());
+
+                 }
+             }
+
+             if (chkPkg.Checked)
+             {
+                 if (pkgArr.Length < 1) return;
+                 for (int i = 0; i < project.PlcCount; i++)  //cpu  수량 만큼  
+                 {
+                     tempArr[i]["AI"] = int.Parse(tempArr[i]["AI"].ToString()) + int.Parse(pkgArr[i]["AI"].ToString()); aiTotal += int.Parse(pkgArr[i]["AI"].ToString());
+                     tempArr[i]["AO"] = int.Parse(tempArr[i]["AO"].ToString()) + int.Parse(pkgArr[i]["AO"].ToString()); aoTotal += int.Parse(pkgArr[i]["AO"].ToString());
+                     tempArr[i]["DI"] = int.Parse(tempArr[i]["DI"].ToString()) + int.Parse(pkgArr[i]["DI"].ToString()); diTotal += int.Parse(pkgArr[i]["DI"].ToString());
+                     tempArr[i]["DO"] = int.Parse(tempArr[i]["DO"].ToString()) + int.Parse(pkgArr[i]["DO"].ToString()); doTotal += int.Parse(pkgArr[i]["DO"].ToString());
+
+                 }
+             }
+
+             if (chkMcc.Checked)
+             {
+                 if (mccArr.Length < 1) return;
+                 for (int i = 0; i < project.PlcCount; i++)  //cpu  수량 만큼  
+                 {
+                     tempArr[i]["AI"] = int.Parse(tempArr[i]["AI"].ToString()) + int.Parse(mccArr[i]["AI"].ToString()); aiTotal += int.Parse(mccArr[i]["AI"].ToString());
+                     tempArr[i]["AO"] = int.Parse(tempArr[i]["AO"].ToString()) + int.Parse(mccArr[i]["AO"].ToString()); aoTotal += int.Parse(mccArr[i]["AO"].ToString());
+                     tempArr[i]["DI"] = int.Parse(tempArr[i]["DI"].ToString()) + int.Parse(mccArr[i]["DI"].ToString()); diTotal += int.Parse(mccArr[i]["DI"].ToString());
+                     tempArr[i]["DO"] = int.Parse(tempArr[i]["DO"].ToString()) + int.Parse(mccArr[i]["DO"].ToString()); doTotal += int.Parse(mccArr[i]["DO"].ToString());
+                 }
+             }
+
+             if (chkHvac.Checked)
+             {
+                 if (hvacArr.Length < 1) return;
+                 for (int i = 0; i < project.PlcCount; i++)  //cpu  수량 만큼  
+                 {
+                     tempArr[i]["AI"] = int.Parse(tempArr[i]["AI"].ToString()) + int.Parse(hvacArr[i]["AI"].ToString()); aiTotal += int.Parse(hvacArr[i]["AI"].ToString());
+                     tempArr[i]["AO"] = int.Parse(tempArr[i]["AO"].ToString()) + int.Parse(hvacArr[i]["AO"].ToString()); aoTotal += int.Parse(hvacArr[i]["AO"].ToString());
+                     tempArr[i]["DI"] = int.Parse(tempArr[i]["DI"].ToString()) + int.Parse(hvacArr[i]["DI"].ToString()); diTotal += int.Parse(hvacArr[i]["DI"].ToString());
+                     tempArr[i]["DO"] = int.Parse(tempArr[i]["DO"].ToString()) + int.Parse(hvacArr[i]["DO"].ToString()); doTotal += int.Parse(hvacArr[i]["DO"].ToString());
+                 }
+             }
+
+             //합계
+             tempArr[project.PlcCount]["AI"] = aiTotal;
+             tempArr[project.PlcCount]["AO"] = aoTotal;
+             tempArr[project.PlcCount]["DI"] = diTotal;
+             tempArr[project.PlcCount]["DO"] = doTotal;
+
+
+             //스페어 
+             tempArr[project.PlcCount + 1]["AI"] = (int)Math.Ceiling(aiTotal * 0.3);
+             tempArr[project.PlcCount + 1]["AO"] = (int)Math.Ceiling(aoTotal * 0.3);
+             tempArr[project.PlcCount + 1]["DI"] = (int)Math.Ceiling(diTotal * 0.3);
+             tempArr[project.PlcCount + 1]["DO"] = (int)Math.Ceiling(doTotal * 0.3);
+
+             //Total
+             tempArr[project.PlcCount + 2]["AI"] = (int)Math.Ceiling(aiTotal + (aiTotal * 0.3));
+             tempArr[project.PlcCount + 2]["AO"] = (int)Math.Ceiling(aoTotal + (aoTotal * 0.3));
+             tempArr[project.PlcCount + 2]["DI"] = (int)Math.Ceiling(diTotal + (diTotal * 0.3));
+             tempArr[project.PlcCount + 2]["DO"] = (int)Math.Ceiling(doTotal + (doTotal * 0.3));
+
+             //module
+             tempArr[project.PlcCount + 3]["AI"] = (int)Math.Ceiling((aiTotal + (aiTotal * 0.3)) / project.AiChannel);
+             tempArr[project.PlcCount + 3]["AO"] = (int)Math.Ceiling((aoTotal + (aoTotal * 0.3)) / project.AoChannel);
+             tempArr[project.PlcCount + 3]["DI"] = (int)Math.Ceiling((diTotal + (diTotal * 0.3)) / project.DiChannel);
+             tempArr[project.PlcCount + 3]["DO"] = (int)Math.Ceiling((doTotal + (doTotal * 0.3)) / project.DoChannel);
+
+             gridTemp.DataSource = dtTempSum;
+         }*/
+
         private void GetSumIoCount()
         {
             if (project == null) return;
-
-            int[,] aiSum = new int[project.PlcCount, 1];
-            int[,] aoSum = new int[project.PlcCount, 1];
-            int[,] diSum = new int[project.PlcCount, 1];
-            int[,] doSum = new int[project.PlcCount, 1];
-            int aiTotal = 0, aoTotal = 0, diTotal = 0, doTotal = 0;
-
+           
             DataRow[] instArr = dtInst.Select();
             DataRow[] pkgArr = dtPkg.Select();
             DataRow[] mccArr = dtMcc.Select();
             DataRow[] hvacArr = dtHvac.Select();
             DataRow[] tempArr = dtTempSum.Select();
 
+            int j = 0;
+            int aiTotalModule = 0, aoTotalModule = 0, diTotalModule = 0, doTotalModule = 0;
+            
 
             for (int i = 0; i < project.PlcCount; i++)  //cpu  수량만큼  
             {
@@ -375,87 +476,88 @@ namespace auto_proj.Form
                 tempArr[i]["AO"] = 0;
                 tempArr[i]["DI"] = 0;
                 tempArr[i]["DO"] = 0;
-            }
+            }           
 
-
-            if (chkInst.Checked)
+            for (int i = 0; i < project.PlcCount; i++)
             {
-                if (instArr.Length < 1) return;
+                int aiTotal = 0, aoTotal = 0, diTotal = 0, doTotal = 0;
+                tempArr[j]["AI"] = 0;
+                tempArr[j]["AO"] = 0;
+                tempArr[j]["DI"] = 0;
+                tempArr[j]["DO"] = 0;
 
-                for (int i = 0; i < project.PlcCount; i++)  //cpu  수량 만큼  
+                if (chkInst.Checked)
                 {
-                    tempArr[i]["AI"] = int.Parse(tempArr[i]["AI"].ToString()) + int.Parse(instArr[i]["AI"].ToString()); aiTotal += int.Parse(instArr[i]["AI"].ToString());
-                    tempArr[i]["AO"] = int.Parse(tempArr[i]["AO"].ToString()) + int.Parse(instArr[i]["AO"].ToString()); aoTotal += int.Parse(instArr[i]["AO"].ToString());
-                    tempArr[i]["DI"] = int.Parse(tempArr[i]["DI"].ToString()) + int.Parse(instArr[i]["DI"].ToString()); diTotal += int.Parse(instArr[i]["DI"].ToString());
-                    tempArr[i]["DO"] = int.Parse(tempArr[i]["DO"].ToString()) + int.Parse(instArr[i]["DO"].ToString()); doTotal += int.Parse(instArr[i]["DO"].ToString());
-
+                    if (instArr.Length < 1) return;
+                    tempArr[j]["AI"] = int.Parse(tempArr[j]["AI"].ToString()) + int.Parse(instArr[i]["AI"].ToString()); aiTotal += int.Parse(instArr[i]["AI"].ToString());
+                    tempArr[j]["AO"] = int.Parse(tempArr[j]["AO"].ToString()) + int.Parse(instArr[i]["AO"].ToString()); aoTotal += int.Parse(instArr[i]["AO"].ToString());
+                    tempArr[j]["DI"] = int.Parse(tempArr[j]["DI"].ToString()) + int.Parse(instArr[i]["DI"].ToString()); diTotal += int.Parse(instArr[i]["DI"].ToString());
+                    tempArr[j]["DO"] = int.Parse(tempArr[j]["DO"].ToString()) + int.Parse(instArr[i]["DO"].ToString()); doTotal += int.Parse(instArr[i]["DO"].ToString());
                 }
+
+                if (chkPkg.Checked)
+                {
+                    if (pkgArr.Length < 1) return;
+                    tempArr[j]["AI"] = int.Parse(tempArr[j]["AI"].ToString()) + int.Parse(pkgArr[i]["AI"].ToString()); aiTotal += int.Parse(pkgArr[i]["AI"].ToString());
+                    tempArr[j]["AO"] = int.Parse(tempArr[j]["AO"].ToString()) + int.Parse(pkgArr[i]["AO"].ToString()); aoTotal += int.Parse(pkgArr[i]["AO"].ToString());
+                    tempArr[j]["DI"] = int.Parse(tempArr[j]["DI"].ToString()) + int.Parse(pkgArr[i]["DI"].ToString()); diTotal += int.Parse(pkgArr[i]["DI"].ToString());
+                    tempArr[j]["DO"] = int.Parse(tempArr[j]["DO"].ToString()) + int.Parse(pkgArr[i]["DO"].ToString()); doTotal += int.Parse(pkgArr[i]["DO"].ToString());
+                }
+
+                if (chkMcc.Checked)
+                {
+                    if (mccArr.Length < 1) return;
+                    tempArr[j]["AI"] = int.Parse(tempArr[j]["AI"].ToString()) + int.Parse(mccArr[i]["AI"].ToString()); aiTotal += int.Parse(mccArr[i]["AI"].ToString());
+                    tempArr[j]["AO"] = int.Parse(tempArr[j]["AO"].ToString()) + int.Parse(mccArr[i]["AO"].ToString()); aoTotal += int.Parse(mccArr[i]["AO"].ToString());
+                    tempArr[j]["DI"] = int.Parse(tempArr[j]["DI"].ToString()) + int.Parse(mccArr[i]["DI"].ToString()); diTotal += int.Parse(mccArr[i]["DI"].ToString());
+                    tempArr[j]["DO"] = int.Parse(tempArr[j]["DO"].ToString()) + int.Parse(mccArr[i]["DO"].ToString()); doTotal += int.Parse(mccArr[i]["DO"].ToString());
+                }
+
+                if (chkHvac.Checked)
+                {
+                    if (hvacArr.Length < 1) return;
+                    tempArr[j]["AI"] = int.Parse(tempArr[j]["AI"].ToString()) + int.Parse(hvacArr[i]["AI"].ToString()); aiTotal += int.Parse(hvacArr[i]["AI"].ToString());
+                    tempArr[j]["AO"] = int.Parse(tempArr[j]["AO"].ToString()) + int.Parse(hvacArr[i]["AO"].ToString()); aoTotal += int.Parse(hvacArr[i]["AO"].ToString());
+                    tempArr[j]["DI"] = int.Parse(tempArr[j]["DI"].ToString()) + int.Parse(hvacArr[i]["DI"].ToString()); diTotal += int.Parse(hvacArr[i]["DI"].ToString());
+                    tempArr[j]["DO"] = int.Parse(tempArr[j]["DO"].ToString()) + int.Parse(hvacArr[i]["DO"].ToString()); doTotal += int.Parse(hvacArr[i]["DO"].ToString());
+                }
+
+
+                //합계
+                //tempArr[++j]["AI"] = aiTotal;
+                //tempArr[j]["AO"] = aoTotal;
+                //tempArr[j++]["DI"] = diTotal;
+                //tempArr[j++]["DO"] = doTotal;
+
+                //스페어 
+                tempArr[++j]["AI"] = (int)Math.Ceiling(aiTotal * 0.3);
+                tempArr[j]["AO"] = (int)Math.Ceiling(aoTotal * 0.3);
+                tempArr[j]["DI"] = (int)Math.Ceiling(diTotal * 0.3);
+                tempArr[j]["DO"] = (int)Math.Ceiling(doTotal * 0.3);
+
+                //Total
+                tempArr[++j]["AI"] = (int)Math.Ceiling(aiTotal + (aiTotal * 0.3)); 
+                tempArr[j]["AO"] = (int)Math.Ceiling(aoTotal + (aoTotal * 0.3)); 
+                tempArr[j]["DI"] = (int)Math.Ceiling(diTotal + (diTotal * 0.3)); 
+                tempArr[j]["DO"] = (int)Math.Ceiling(doTotal + (doTotal * 0.3)); 
+
+                //module
+                tempArr[++j]["AI"] = (int)Math.Ceiling((aiTotal + (aiTotal * 0.3)) / project.AiChannel); aiTotalModule += (int)Math.Ceiling((aiTotal + (aiTotal * 0.3)) / project.AiChannel);
+                tempArr[j]["AO"] = (int)Math.Ceiling((aoTotal + (aoTotal * 0.3)) / project.AoChannel); aoTotalModule += (int)Math.Ceiling((aoTotal + (aoTotal * 0.3)) / project.AoChannel);
+                tempArr[j]["DI"] = (int)Math.Ceiling((diTotal + (diTotal * 0.3)) / project.DiChannel); diTotalModule += (int)Math.Ceiling((diTotal + (diTotal * 0.3)) / project.DiChannel);
+                tempArr[j]["DO"] = (int)Math.Ceiling((doTotal + (doTotal * 0.3)) / project.DoChannel); doTotalModule += (int)Math.Ceiling((doTotal + (doTotal * 0.3)) / project.DoChannel);
+
+                j++;
             }
 
-            if (chkPkg.Checked)
-            {
-                if (pkgArr.Length < 1) return;
-                for (int i = 0; i < project.PlcCount; i++)  //cpu  수량 만큼  
-                {
-                    tempArr[i]["AI"] = int.Parse(tempArr[i]["AI"].ToString()) + int.Parse(pkgArr[i]["AI"].ToString()); aiTotal += int.Parse(pkgArr[i]["AI"].ToString());
-                    tempArr[i]["AO"] = int.Parse(tempArr[i]["AO"].ToString()) + int.Parse(pkgArr[i]["AO"].ToString()); aoTotal += int.Parse(pkgArr[i]["AO"].ToString());
-                    tempArr[i]["DI"] = int.Parse(tempArr[i]["DI"].ToString()) + int.Parse(pkgArr[i]["DI"].ToString()); diTotal += int.Parse(pkgArr[i]["DI"].ToString());
-                    tempArr[i]["DO"] = int.Parse(tempArr[i]["DO"].ToString()) + int.Parse(pkgArr[i]["DO"].ToString()); doTotal += int.Parse(pkgArr[i]["DO"].ToString());
-
-                }
-            }
-
-            if (chkMcc.Checked)
-            {
-                if (mccArr.Length < 1) return;
-                for (int i = 0; i < project.PlcCount; i++)  //cpu  수량 만큼  
-                {
-                    tempArr[i]["AI"] = int.Parse(tempArr[i]["AI"].ToString()) + int.Parse(mccArr[i]["AI"].ToString()); aiTotal += int.Parse(mccArr[i]["AI"].ToString());
-                    tempArr[i]["AO"] = int.Parse(tempArr[i]["AO"].ToString()) + int.Parse(mccArr[i]["AO"].ToString()); aoTotal += int.Parse(mccArr[i]["AO"].ToString());
-                    tempArr[i]["DI"] = int.Parse(tempArr[i]["DI"].ToString()) + int.Parse(mccArr[i]["DI"].ToString()); diTotal += int.Parse(mccArr[i]["DI"].ToString());
-                    tempArr[i]["DO"] = int.Parse(tempArr[i]["DO"].ToString()) + int.Parse(mccArr[i]["DO"].ToString()); doTotal += int.Parse(mccArr[i]["DO"].ToString());
-                }
-            }
-
-            if (chkHvac.Checked)
-            {
-                if (hvacArr.Length < 1) return;
-                for (int i = 0; i < project.PlcCount; i++)  //cpu  수량 만큼  
-                {
-                    tempArr[i]["AI"] = int.Parse(tempArr[i]["AI"].ToString()) + int.Parse(hvacArr[i]["AI"].ToString()); aiTotal += int.Parse(hvacArr[i]["AI"].ToString());
-                    tempArr[i]["AO"] = int.Parse(tempArr[i]["AO"].ToString()) + int.Parse(hvacArr[i]["AO"].ToString()); aoTotal += int.Parse(hvacArr[i]["AO"].ToString());
-                    tempArr[i]["DI"] = int.Parse(tempArr[i]["DI"].ToString()) + int.Parse(hvacArr[i]["DI"].ToString()); diTotal += int.Parse(hvacArr[i]["DI"].ToString());
-                    tempArr[i]["DO"] = int.Parse(tempArr[i]["DO"].ToString()) + int.Parse(hvacArr[i]["DO"].ToString()); doTotal += int.Parse(hvacArr[i]["DO"].ToString());
-                }
-            }
-
-            //합계
-            tempArr[project.PlcCount]["AI"] = aiTotal;
-            tempArr[project.PlcCount]["AO"] = aoTotal;
-            tempArr[project.PlcCount]["DI"] = diTotal;
-            tempArr[project.PlcCount]["DO"] = doTotal;
-
-
-            //스페어 
-            tempArr[project.PlcCount + 1]["AI"] = (int)Math.Ceiling(aiTotal * 0.3);
-            tempArr[project.PlcCount + 1]["AO"] = (int)Math.Ceiling(aoTotal * 0.3);
-            tempArr[project.PlcCount + 1]["DI"] = (int)Math.Ceiling(diTotal * 0.3);
-            tempArr[project.PlcCount + 1]["DO"] = (int)Math.Ceiling(doTotal * 0.3);
-
-            //Total
-            tempArr[project.PlcCount + 2]["AI"] = (int)Math.Ceiling(aiTotal + (aiTotal * 0.3));
-            tempArr[project.PlcCount + 2]["AO"] = (int)Math.Ceiling(aoTotal + (aoTotal * 0.3));
-            tempArr[project.PlcCount + 2]["DI"] = (int)Math.Ceiling(diTotal + (diTotal * 0.3));
-            tempArr[project.PlcCount + 2]["DO"] = (int)Math.Ceiling(doTotal + (doTotal * 0.3));
-
-            //module
-            tempArr[project.PlcCount + 3]["AI"] = (int)Math.Ceiling((aiTotal + (aiTotal * 0.3)) / project.AiChannel);
-            tempArr[project.PlcCount + 3]["AO"] = (int)Math.Ceiling((aoTotal + (aoTotal * 0.3)) / project.AoChannel);
-            tempArr[project.PlcCount + 3]["DI"] = (int)Math.Ceiling((diTotal + (diTotal * 0.3)) / project.DiChannel);
-            tempArr[project.PlcCount + 3]["DO"] = (int)Math.Ceiling((doTotal + (doTotal * 0.3)) / project.DoChannel);
+            tempArr[j]["AI"] = aiTotalModule;
+            tempArr[j]["AO"] = aoTotalModule;
+            tempArr[j]["DI"] = diTotalModule;
+            tempArr[j]["DO"] = doTotalModule;
 
             gridTemp.DataSource = dtTempSum;
         }
+    
 
         private void CreateDataTable()
         {        
@@ -491,61 +593,60 @@ namespace auto_proj.Form
                 dtTempSum.Columns.Add(column4);
                 dtTempSum.Columns.Add(column5);
 
-                for (int i=0; i<project.PlcCount; i++)
+                for (int i = 0; i < project.PlcCount; i++)
                 {
-                    DataRow row = dtTempSum.NewRow();
-                    row["TITLE"] = "PLC" + (i + 1).ToString();
-                    row["AI"] = 0;
-                    row["AO"] = 0;
-                    row["DI"] = 0;
-                    row["DO"] = 0;
+                    {
+                        DataRow row = dtTempSum.NewRow();
+                        row["TITLE"] = "PLC" + (i + 1).ToString();
+                        row["AI"] = 0;
+                        row["AO"] = 0;
+                        row["DI"] = 0;
+                        row["DO"] = 0;
+                        dtTempSum.Rows.Add(row);
+                    }
+                   
+                    {
+                        DataRow row = dtTempSum.NewRow();
+                        row["TITLE"] = "SPARE";
+                        row["AI"] = 0;
+                        row["AO"] = 0;
+                        row["DI"] = 0;
+                        row["DO"] = 0;
+                        dtTempSum.Rows.Add(row);
+                    }
+                    {
+                        DataRow row = dtTempSum.NewRow();
+                        row["TITLE"] = "TOTAL";
+                        row["AI"] = 0;
+                        row["AO"] = 0;
+                        row["DI"] = 0;
+                        row["DO"] = 0;
+                        dtTempSum.Rows.Add(row);
+                    }
 
-                    dtTempSum.Rows.Add(row);
+                    {
+                        DataRow row = dtTempSum.NewRow();
+                        row["TITLE"] = "MODULE";
+                        row["AI"] = 0;
+                        row["AO"] = 0;
+                        row["DI"] = 0;
+                        row["DO"] = 0;
+                        dtTempSum.Rows.Add(row);
+                    }                    
                 }
+
                 {
                     DataRow row = dtTempSum.NewRow();
-                    row["TITLE"] = "SUM";
+                    row["TITLE"] = "TOTAL MODULE";
                     row["AI"] = 0;
                     row["AO"] = 0;
                     row["DI"] = 0;
                     row["DO"] = 0;
-
-                    dtTempSum.Rows.Add(row);
-                }
-                {
-                    DataRow row = dtTempSum.NewRow();
-                    row["TITLE"] = "SPARE";
-                    row["AI"] = 0;
-                    row["AO"] = 0;
-                    row["DI"] = 0;
-                    row["DO"] = 0;
-
-                    dtTempSum.Rows.Add(row);
-                }
-                {
-                    DataRow row = dtTempSum.NewRow();
-                    row["TITLE"] = "TOTAL";
-                    row["AI"] = 0;
-                    row["AO"] = 0;
-                    row["DI"] = 0;
-                    row["DO"] = 0;
-
-                    dtTempSum.Rows.Add(row);
-                }
-
-                {
-                    DataRow row = dtTempSum.NewRow();
-                    row["TITLE"] = "MODULE";
-                    row["AI"] = 0;
-                    row["AO"] = 0;
-                    row["DI"] = 0;
-                    row["DO"] = 0;
-
                     dtTempSum.Rows.Add(row);
                 }
             }
 
-            {// 저장되 IO 불러오기 위한 
+            {// 저장된 IO 불러오기 위한 
                 DataColumn column1 = new DataColumn("TITLE", typeof(string));
                 DataColumn column2 = new DataColumn("AI", typeof(int));
                 DataColumn column3 = new DataColumn("AO", typeof(int));
@@ -560,54 +661,51 @@ namespace auto_proj.Form
 
                 for (int i = 0; i < project.PlcCount; i++)
                 {
-                    DataRow row = dtSaved.NewRow();
-                    row["TITLE"] = "PLC" + (i + 1).ToString();
-                    row["AI"] = 0;
-                    row["AO"] = 0;
-                    row["DI"] = 0;
-                    row["DO"] = 0;
-
-                    dtSaved.Rows.Add(row);
-                }
-                {
-                    DataRow row = dtSaved.NewRow();
-                    row["TITLE"] = "SUM";
-                    row["AI"] = 0;
-                    row["AO"] = 0;
-                    row["DI"] = 0;
-                    row["DO"] = 0;
-
-                    dtSaved.Rows.Add(row);
-                }
-                {
-                    DataRow row = dtSaved.NewRow();
-                    row["TITLE"] = "SPARE";
-                    row["AI"] = 0;
-                    row["AO"] = 0;
-                    row["DI"] = 0;
-                    row["DO"] = 0;
-
-                    dtSaved.Rows.Add(row);
-                }
-                {
-                    DataRow row = dtSaved.NewRow();
-                    row["TITLE"] = "TOTAL";
-                    row["AI"] = 0;
-                    row["AO"] = 0;
-                    row["DI"] = 0;
-                    row["DO"] = 0;
-
-                    dtSaved.Rows.Add(row);
+                    {
+                        DataRow row = dtSaved.NewRow();
+                        row["TITLE"] = "PLC" + (i + 1).ToString();
+                        row["AI"] = 0;
+                        row["AO"] = 0;
+                        row["DI"] = 0;
+                        row["DO"] = 0;
+                        dtSaved.Rows.Add(row);
+                    }                   
+                    {
+                        DataRow row = dtSaved.NewRow();
+                        row["TITLE"] = "SPARE";
+                        row["AI"] = 0;
+                        row["AO"] = 0;
+                        row["DI"] = 0;
+                        row["DO"] = 0;
+                        dtSaved.Rows.Add(row);
+                    }
+                    {
+                        DataRow row = dtSaved.NewRow();
+                        row["TITLE"] = "TOTAL";
+                        row["AI"] = 0;
+                        row["AO"] = 0;
+                        row["DI"] = 0;
+                        row["DO"] = 0;
+                        dtSaved.Rows.Add(row);
+                    }
+                    {
+                        DataRow row = dtSaved.NewRow();
+                        row["TITLE"] = "MODULE";
+                        row["AI"] = 0;
+                        row["AO"] = 0;
+                        row["DI"] = 0;
+                        row["DO"] = 0;
+                        dtSaved.Rows.Add(row);
+                    }                    
                 }
 
                 {
                     DataRow row = dtSaved.NewRow();
-                    row["TITLE"] = "MODULE";
+                    row["TITLE"] = "TOTAL MODULE";
                     row["AI"] = 0;
                     row["AO"] = 0;
                     row["DI"] = 0;
                     row["DO"] = 0;
-
                     dtSaved.Rows.Add(row);
                 }
             }

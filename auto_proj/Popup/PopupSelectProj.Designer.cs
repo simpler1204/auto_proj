@@ -29,6 +29,7 @@ namespace auto_proj.Popup
         /// </summary>
         private void InitializeComponent()
         {
+            DevExpress.XtraGrid.GridLevelNode gridLevelNode1 = new DevExpress.XtraGrid.GridLevelNode();
             this.labelControl1 = new DevExpress.XtraEditors.LabelControl();
             this.txtselect = new System.Windows.Forms.TextBox();
             this.gridProjects = new DevExpress.XtraGrid.GridControl();
@@ -61,6 +62,9 @@ namespace auto_proj.Popup
             // 
             // gridProjects
             // 
+            gridLevelNode1.RelationName = "Level1";
+            this.gridProjects.LevelTree.Nodes.AddRange(new DevExpress.XtraGrid.GridLevelNode[] {
+            gridLevelNode1});
             this.gridProjects.Location = new System.Drawing.Point(3, 88);
             this.gridProjects.MainView = this.gridView1;
             this.gridProjects.Name = "gridProjects";
